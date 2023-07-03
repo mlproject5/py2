@@ -3,9 +3,8 @@ import os
 from PyPDF2 import PdfMerger
 from PyPDF2 import PdfWriter, PdfReader
 
-
-
-st.set_page_config(page_title='PDFmsX', page_icon='pdf.png', layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title='PDFmsX', page_icon='pdf.png', layout="centered", initial_sidebar_state="auto",
+                   menu_items=None)
 
 hide_streamlit_style = """
     <style>
@@ -14,6 +13,7 @@ hide_streamlit_style = """
     """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+
 def merge():
     def merge_pdfs(pdfs):
         merger = PdfMerger()
@@ -21,7 +21,7 @@ def merge():
         for pdf in pdfs:
             merger.append(pdf)
 
-        output_path = 'merged.pdf'
+        output_path = os.path.splitext(pdfs[0])[0] + "_merge.pdf"
         merger.write(output_path)
         merger.close()
 
@@ -29,7 +29,8 @@ def merge():
 
     def main():
         st.markdown(
-            "<center><h1 style='font-family: Comic Sans MS; font-weight: 300; font-size: 32px;'>PDF Merger</h1></center>",
+            "<center><h1 style='font-family: Comic Sans MS; font-weight: 300; font-size: 32px;'>PDF "
+            "Merger</h1></center>",
             unsafe_allow_html=True)
 
         uploaded_files = st.file_uploader("Upload Multiple PDF files", accept_multiple_files=True, type="pdf")
@@ -46,12 +47,14 @@ def merge():
                 st.success("PDFs merged successfully!")
 
                 with open(merged_pdf_path, "rb") as f:
-                    st.download_button(label="Download", data=f, file_name="merged.pdf")
+                    st.download_button(label="Download", data=f, file_name=os.path.basename(merged_pdf_path))
+
             else:
                 st.warning("Please upload at least one PDF file.")
 
     if __name__ == "__main__":
         main()
+
 
 def split():
     def split_pdf(pdf_path, start_page, end_page):
@@ -70,7 +73,7 @@ def split():
             if page_number <= total_pages:
                 pdf_writer.add_page(pdf_reader.pages[page_number - 1])
 
-        output_path = os.path.splitext(pdf_path)[0] + "_split.pdf"
+        output_path = os.path.splitext(os.path.basename(pdf_path))[0] + "_split.pdf"
 
         with open(output_path, "wb") as output_file:
             pdf_writer.write(output_file)
@@ -106,13 +109,14 @@ def split():
         main()
 
 
-
 def main():
     st.sidebar.markdown(
-        "<center><h1 style='font-family: Comic Sans MS; font-weight: 300; font-size: 24px;'>Merge and Split</h1></center>",
+        "<center><h1 style='font-family: Comic Sans MS; font-weight: 300; font-size: 24px;'>Merge and "
+        "Split</h1></center>",
         unsafe_allow_html=True)
     st.sidebar.image(
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu07FFtGLz9EV84QYqIrkwbS_AfdDLZaS75Sqj_Pls-oPaDX6UITS6OkKDAvML207ccwI&usqp=CAU",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu07FFtGLz9EV84QYqIrkwbS_AfdDLZaS75Sqj_Pls"
+        "-oPaDX6UITS6OkKDAvML207ccwI&usqp=CAU",
         use_column_width=True)
 
     selected_sidebar = st.sidebar.radio("Please Select One", ["PDF Merge", "PDF Split"])
